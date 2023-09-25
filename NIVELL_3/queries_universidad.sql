@@ -10,18 +10,14 @@ SELECT p.apellido1, p.apellido2, p.nombre FROM persona p JOIN alumno_se_matricul
 -- A PARTIR D'AQUÍ CONSULTES LEFT JOIN / RIGHT JOIN: 
 -- CONSULTA 1 CORREGIDA:
 SELECT dep.nombre, p.apellido2, p.apellido1, p.nombre FROM persona p LEFT JOIN profesor prof on prof.id_profesor = p.id LEFT JOIN departamento dep ON dep.id = prof.id_departamento  WHERE p.tipo = "profesor" ORDER BY dep.nombre, p.apellido2, p.apellido1, p.nombre;
--- CONSULTA 2 REALITZADA (2 VERSIONS)
+-- CONSULTA 2 REALITZADA (2 VERSIONS):
 SELECT p.apellido2, p.apellido1, p.nombre FROM persona p WHERE p.tipo = "profesor" AND NOT EXISTS (SELECT * FROM profesor prof WHERE prof.id_profesor = p.id) ORDER BY p.apellido2, p.apellido1, p.nombre;
 SELECT p.apellido2, p.apellido1, p.nombre FROM persona p LEFT JOIN profesor prof on prof.id_profesor = p.id  WHERE p.tipo = "profesor" AND prof.id_profesor IS NULL ORDER BY p.apellido2, p.apellido1, p.nombre;
 SELECT dep.nombre, id_profesor FROM departamento dep LEFT JOIN profesor prof ON dep.id = prof.id_departamento WHERE id_profesor IS NULL;
 SELECT p.apellido2, p.apellido1, p.nombre, asig.id AS id_asignatura FROM profesor prof LEFT JOIN asignatura asig ON prof.id_profesor = asig.id_profesor LEFT JOIN persona p ON prof.id_profesor = p.id WHERE asig.id IS NULL ORDER BY apellido2, apellido1, nombre; 
 SELECT asig.nombre, prof.id_profesor FROM asignatura asig LEFT JOIN profesor prof ON asig.id_profesor = prof.id_profesor WHERE asig.id_profesor IS NULL;
 -- CONSULTA 6 CORREGIDA:
-SELECT DISTINCT dep.nombre FROM departamento dep WHERE dep.nombre NOT IN(
-SELECT dep.nombre FROM departamento dep LEFT JOIN profesor prof ON dep.id = prof.id_departamento
- LEFT JOIN asignatura asig ON prof.id_profesor = asig.id_profesor 
- INNER JOIN alumno_se_matricula_asignatura ama ON asig.id = ama.id_asignatura);
- 
+SELECT DISTINCT dep.nombre FROM departamento dep WHERE dep.nombre NOT IN(SELECT dep.nombre FROM departamento dep LEFT JOIN profesor prof ON dep.id = prof.id_departamento LEFT JOIN asignatura asig ON prof.id_profesor = asig.id_profesor INNER JOIN alumno_se_matricula_asignatura ama ON asig.id = ama.id_asignatura);
 -- CONSULTES RESUM:
 SELECT COUNT(*) FROM persona WHERE tipo = "alumno";
 SELECT COUNT(*) FROM persona WHERE tipo = "alumno" AND fecha_nacimiento LIKE "%1999%";
@@ -37,6 +33,4 @@ SELECT DISTINCT ce.anyo_inicio, COUNT(id_alumno) FROM curso_escolar ce JOIN alum
 SELECT prof.id_profesor, p.nombre, p.apellido1, p.apellido2, COUNT(asig.nombre) FROM profesor prof LEFT JOIN persona p ON p.id = prof.id_profesor LEFT JOIN asignatura asig ON prof.id_profesor = asig.id_profesor GROUP BY prof.id_profesor ORDER BY asig.nombre DESC;
 SELECT * FROM persona WHERE  tipo = "alumno" ORDER BY fecha_nacimiento DESC LIMIT 1;
 -- CONSULTA 11 REALITZADA:
-SELECT p.apellido2, p.apellido1, p.nombre FROM persona p LEFT JOIN profesor prof ON p.id = prof.id_profesor 
-WHERE prof.id_profesor NOT IN (
-SELECT prof.id_profesor FROM profesor prof INNER JOIN asignatura asig ON prof.id_profesor = asig.id_profesor);
+SELECT p.apellido2, p.apellido1, p.nombre FROM persona p LEFT JOIN profesor prof ON p.id = prof.id_profesor WHERE prof.id_profesor NOT IN (SELECT prof.id_profesor FROM profesor prof INNER JOIN asignatura asig ON prof.id_profesor = asig.id_profesor);
